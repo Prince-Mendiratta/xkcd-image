@@ -1,12 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XKCD</title>
-</head>
-<body>
-    
-</body>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test Page</title>
+        <link rel="stylesheet" href="style.css" />
+
+        <script type="text/javascript">
+            function display() {
+                document.write('You entered: ' + document.myform.data.value);
+            }
+            function myFunction() {
+                document.getElementById('xkcd-img').src = ''
+                fetch('/image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: document.getElementById('xkcd-id').value
+                    })
+                }).then(async res => {
+                    res = await res.json()
+                    console.log('Request complete! response:', res);
+                    var head = document.getElementById('heading');
+                    head.innerHTML = 'Here\'s the XKCD image for the ID you provided!';
+                    if(res.statusCode == 201){
+                        head.innerHTML = 'Woops, the image ID you entered was invalid. Here\'s a random XKCD instead!';
+                    }
+                    var image = document.getElementById('xkcd-img');
+                    image.src = res.img;
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <p id="heading">
+            This feature will allow you to fetch the XKCD for a given ID.
+        </p>
+        <img id="xkcd-img" src="" />
+        <br />
+        <label for="html">Please enter the ID for the XKCD</label><br />
+        <input type="text" id="xkcd-id" /><br /><br />
+
+        <button onclick="myFunction()">Fetch XKCD</button>
+    </body>
 </html>
